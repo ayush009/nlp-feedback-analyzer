@@ -1,5 +1,11 @@
 [theme]
-base="light"
-primaryColor="#64ff4b"
-backgroundColor="#cecdcd"
-secondaryBackgroundColor="#d1dbf5"
+base = "light"
+primaryColor = "#64ff4b"
+backgroundColor = "#cecdcd"
+secondaryBackgroundColor = "#d1dbf5"
+
+[server]
+fileWatcherType = "none"      # stop the inotify/watchdog warning on Streamlit Cloud
+headless = true
+enableXsrfProtection = true
+enableCORS = false

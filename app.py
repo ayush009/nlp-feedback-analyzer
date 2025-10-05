@@ -30,9 +30,13 @@ def set_background(image_file: str = "image.jpg"):
 
 def plot_confusion_matrix(cm, labels, title="Performance"):
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, cmap="Blues", fmt="g",
-                xticklabels=labels, yticklabels=labels, ax=ax)
-    ax.set_xlabel("Predicted"); ax.set_ylabel("True"); ax.set_title(title)
+    sns.heatmap(
+        cm, annot=True, cmap="Blues", fmt="g",
+        xticklabels=labels, yticklabels=labels, ax=ax
+    )
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("True")
+    ax.set_title(title)
     st.pyplot(fig)
     plt.close(fig)
 
@@ -110,14 +114,17 @@ else:
     if uploaded_file is not None:
         test_df = pd.read_csv(uploaded_file)
     else:
+        if not os.path.exists("test_data.csv"):
+            st.error("test_data.csv not found and nothing uploaded.")
+            st.stop()
         test_df = pd.read_csv("test_data.csv")
 
-    # normalize column names
-    cols = {c.lower(): c for c in test_df.columns}
-    if not {"response", "person"}.issubset(cols):
+    # normalize column names (case-insensitive)
+    cols_map = {c.lower(): c for c in test_df.columns}
+    if not {"response", "person"}.issubset(cols_map):
         st.error("CSV must contain 'response' and 'person' columns.")
         st.stop()
-    test_df = test_df.rename(columns={cols["response"]: "response", cols["person"]: "person"})
+    test_df = test_df.rename(columns={cols_map["response"]: "response", cols_map["person"]: "person"})
 
     if st.button("Evaluate Models"):
         X_test = vectorizer.transform(test_df["response"])
@@ -133,7 +140,7 @@ else:
             report_df = classification_report_to_df(
                 classification_report(y_test, y_pred, zero_division=0)
             )
-            st.dataframe(report_df, use_container_width=True)
+            st.dataframe(report_df, width="stretch")  # <- updated
 
             cm = confusion_matrix(y_test, y_pred, labels=labels_sorted)
             plot_confusion_matrix(cm, labels_sorted, title=f"{name} — Confusion Matrix")
